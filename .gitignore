@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+mlruns/
+mlartifacts/
+# NOTE: artifacts/ is managed by DVC (it adds its own entries).
+# NOTE: model/model.h5 is deliberately NOT ignored, the Docker build needs it.

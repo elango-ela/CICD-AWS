@@ -1,0 +1,55 @@
+stages:
+  data_ingestion:
+    cmd: python -m pipeline.stage_01_data_ingestion
+    deps:
+      - pipeline/stage_01_data_ingestion.py
+    params:
+      - data_url
+      - data_dir
+      - classes
+    outs:
+      - artifacts/data_ingestion/dataset
+
+  preprocessing:
+    cmd: python -m pipeline.stage_02_preprocessing
+    deps:
+      - pipeline/stage_02_preprocessing.py
+      - artifacts/data_ingestion/dataset
+    params:
+      - seed
+      - test_size
+      - val_size
+      - classes
+    outs:
+      - artifacts/preprocessing
+
+  training:
+    cmd: python -m pipeline.stage_03_training
+    deps:
+      - pipeline/stage_03_training.py
+      - artifacts/preprocessing
+    params:
+      - image_size
+      - batch_size
+      - epochs
+      - learning_rate
+      - weights
+      - early_stopping_patience
+      - use_class_weight
+      - augmentation
+    outs:
+      - artifacts/training/model.h5
+      -  model/model.h5
+  evaluation:
+    cmd: python -m pipeline.stage_04_evaluation
+    deps:
+      - pipeline/stage_04_evaluation.py
+      - artifacts/preprocessing/test.csv
+      - artifacts/training/model.h5
+    params:
+      - threshold
+    outs:
+      - artifacts/evaluation
+    metrics:
+      - scores.json:
+          cache: false

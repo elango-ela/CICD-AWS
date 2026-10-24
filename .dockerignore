@@ -1,0 +1,9 @@
+.git
+.dvc
+.github
+artifacts
+mlruns
+data
+__pycache__
+*.pyc
+.env

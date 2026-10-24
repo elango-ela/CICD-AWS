@@ -1,0 +1,117 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python -m pipeline.stage_01_data_ingestion
+    deps:
+    - path: pipeline/stage_01_data_ingestion.py
+      hash: md5
+      md5: b12a76528d516971faae56805c0154c5
+      size: 2541
+    params:
+      params.yaml:
+        classes:
+        - no
+        - yes
+        data_dir: artifacts/data_ingestion
+        data_url: 
+          https://drive.google.com/file/d/1rP3FZWqGJa9JN5mFZlMDKWrpfR_nyCG-/view?usp=sharing
+    outs:
+    - path: artifacts/data_ingestion/dataset
+      hash: md5
+      md5: 46b828727342b33dd3de09b406591597.dir
+      size: 10878841
+      nfiles: 284
+  preprocessing:
+    cmd: python -m pipeline.stage_02_preprocessing
+    deps:
+    - path: artifacts/data_ingestion/dataset
+      hash: md5
+      md5: 46b828727342b33dd3de09b406591597.dir
+      size: 10878841
+      nfiles: 284
+    - path: pipeline/stage_02_preprocessing.py
+      hash: md5
+      md5: 3cee1cf0a89210ed4e6696c31eadef76
+      size: 1699
+    params:
+      params.yaml:
+        classes:
+        - no
+        - yes
+        seed: 42
+        test_size: 0.1
+        val_size: 0.1
+    outs:
+    - path: artifacts/preprocessing
+      hash: md5
+      md5: 027701d3748fc28e098af690a84f7c5c.dir
+      size: 14367
+      nfiles: 4
+  training:
+    cmd: python -m pipeline.stage_03_training
+    deps:
+    - path: artifacts/preprocessing
+      hash: md5
+      md5: 027701d3748fc28e098af690a84f7c5c.dir
+      size: 14367
+      nfiles: 4
+    - path: pipeline/stage_03_training.py
+      hash: md5
+      md5: b3451e4f02804a24144b4c2df98d0025
+      size: 4072
+    params:
+      params.yaml:
+        augmentation:
+          rotation_range: 15
+          width_shift_range: 0.1
+          height_shift_range: 0.1
+          zoom_range: 0.1
+          shear_range: 0.01
+          brightness_range:
+          - 0.7
+          - 1.3
+          horizontal_flip: true
+        batch_size: 32
+        early_stopping_patience: 10
+        epochs: 50
+        image_size: 128
+        learning_rate: 0.001
+        use_class_weight: true
+        weights: imagenet
+    outs:
+    - path: artifacts/training/model.h5
+      hash: md5
+      md5: e81284bbd36f10ddb7173a8be369b709
+      size: 94146072
+    - path: model/model.h5
+      hash: md5
+      md5: e81284bbd36f10ddb7173a8be369b709
+      size: 94146072
+  evaluation:
+    cmd: python -m pipeline.stage_04_evaluation
+    deps:
+    - path: artifacts/preprocessing/test.csv
+      hash: md5
+      md5: 8b38c898999d0faa95afdcaf129f1e43
+      size: 1469
+    - path: artifacts/training/model.h5
+      hash: md5
+      md5: e81284bbd36f10ddb7173a8be369b709
+      size: 94146072
+    - path: pipeline/stage_04_evaluation.py
+      hash: md5
+      md5: 0e2d399bacf6d9f5520953dbf35f9e58
+      size: 3263
+    params:
+      params.yaml:
+        threshold: 0.5
+    outs:
+    - path: artifacts/evaluation
+      hash: md5
+      md5: b3769004eb3c80b2d64cdc689d79511a.dir
+      size: 38908
+      nfiles: 3
+    - path: scores.json
+      hash: md5
+      md5: 8a8cfea11980569dca3126589fc139cd
+      size: 210

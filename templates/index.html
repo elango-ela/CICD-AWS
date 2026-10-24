@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brain Tumor MRI Classifier</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 520px; margin: 40px auto; padding: 0 16px; }
+  img { max-width: 100%; margin-top: 16px; border-radius: 8px; }
+  button { margin-top: 12px; padding: 8px 16px; }
+  .bar { background: #e5e7eb; border-radius: 4px; height: 8px; }
+  .bar > div { background: #2563eb; height: 8px; border-radius: 4px; }
+  #result { margin-top: 16px; }
+</style>
+</head>
+<body>
+  <h1>Brain Tumor MRI Classifier</h1>
+  <p>Upload a brain MRI image. For learning purposes only, not for medical use.</p>
+  <input type="file" id="file" accept="image/*">
+  <button id="go">Predict</button>
+  <div id="result"></div>
+  <img id="preview" alt="">
+<script>
+const file = document.getElementById('file'), out = document.getElementById('result');
+file.onchange = () => { document.getElementById('preview').src = URL.createObjectURL(file.files[0]); };
+document.getElementById('go').onclick = async () => {
+  if (!file.files[0]) { out.textContent = 'Choose an image first.'; return; }
+  out.textContent = 'Predicting...';
+  const fd = new FormData(); fd.append('file', file.files[0]);
+  const r = await fetch('/predict', { method: 'POST', body: fd });
+  const d = await r.json();
+  if (!r.ok) { out.textContent = d.error; return; }
+  const pct = (d.probability_tumor * 100).toFixed(1);
+  out.innerHTML = '<h2>' + d.label + '</h2><div>Confidence: ' + (d.confidence * 100).toFixed(1) +
+    '%</div><div>Tumor probability: ' + pct + '%</div><div class="bar"><div style="width:' + pct + '%"></div></div>';
+};
+</script>
+</body>
+</html>

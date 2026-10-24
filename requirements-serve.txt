@@ -1,0 +1,8 @@
+# only what the Docker image needs to serve predictions
+tensorflow-cpu==2.15.0
+numpy<2
+pillow
+pyyaml
+flask
+flask-cors
+gunicorn

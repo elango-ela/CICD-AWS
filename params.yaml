@@ -1,0 +1,39 @@
+# ---------- data ----------
+# ONE zip on Google Drive (shared as "Anyone with the link") that contains two folders:
+#   yes/  (tumor present)      no/  (no tumor)
+data_url: "https://drive.google.com/file/d/1rP3FZWqGJa9JN5mFZlMDKWrpfR_nyCG-/view?usp=sharing"
+data_dir: artifacts/data_ingestion
+
+# Folder names inside the zip. Order defines the label:  no -> 0,  yes -> 1  (yes = tumor = positive class)
+classes: ["no", "yes"]
+labels:                       # text shown to the user
+  "no": "No tumor"
+  "yes": "Tumor detected"
+
+# ---------- split ----------
+seed: 42
+test_size: 0.10               # 10% of all images -> test
+val_size: 0.10                # 10% of the remaining 90% -> validation (early stopping only)
+
+# ---------- model / training ----------
+image_size: 128
+batch_size: 32
+epochs: 50
+learning_rate: 0.001
+weights: imagenet             # use null to train from scratch
+early_stopping_patience: 10
+use_class_weight: true        # compensates for yes/no imbalance
+threshold: 0.5                # probability >= threshold -> "yes"
+augmentation:                 # training images only
+  rotation_range: 15
+  width_shift_range: 0.1
+  height_shift_range: 0.1
+  zoom_range: 0.1
+  shear_range: 0.01
+  brightness_range: [0.7, 1.3]
+  horizontal_flip: true
+
+# ---------- mlflow ----------
+# Set MLFLOW_TRACKING_URI / _USERNAME / _PASSWORD env vars for DagsHub.
+# Without them, runs are stored locally in ./mlruns
+mlflow_experiment: brain-tumor-yes-no
