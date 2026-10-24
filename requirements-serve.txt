@@ -1,5 +1,6 @@
 # only what the Docker image needs to serve predictions
 tensorflow-cpu==2.18.0
+keras==3.15.1
 numpy<2
 pillow
 pyyaml
